@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "gameplay",
+    "frontend-3ds",
+]
+resolver = "2"
