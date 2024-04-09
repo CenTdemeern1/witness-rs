@@ -1,3 +1,8 @@
+#[macro_use]
+extern crate witness_core;
+
+pub mod grid;
+
 pub fn add(left: usize, right: usize) -> usize {
     left + right
 }

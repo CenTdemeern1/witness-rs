@@ -152,6 +152,9 @@ dependencies = [
 [[package]]
 name = "gameplay"
 version = "0.1.0"
+dependencies = [
+ "witness-core",
+]
 
 [[package]]
 name = "glob"
@@ -593,6 +596,10 @@ dependencies = [
  "ctru-rs",
  "gameplay",
 ]
+
+[[package]]
+name = "witness-core"
+version = "0.1.0"
 
 [[package]]
 name = "yansi-term"
