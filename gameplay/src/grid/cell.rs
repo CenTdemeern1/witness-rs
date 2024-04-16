@@ -1,7 +1,50 @@
-use super::color::Color;
+use std::{rc::Rc, sync::RwLock};
+
+use super::{color::Color, EdgeRef, VertexID};
+
+pub type CellRef = Rc<RwLock<Cell>>;
+
+#[derive(Debug, Clone)]
+pub struct Cell {
+    edges: Vec<EdgeRef>,
+    pub kind: CellType,
+}
+
+impl Cell {
+    pub fn new(edges: Vec<EdgeRef>) -> Self {
+        Cell {
+            edges,
+            kind: CellType::Blank,
+        }
+    }
+
+    pub fn new_of_kind(edges: Vec<EdgeRef>, kind: CellType) -> Self {
+        Cell { edges, kind }
+    }
+
+    /// Checks whether the given edge borders this cell.
+    pub fn has_edge(&self, edge: &EdgeRef) -> bool {
+        self.edges
+            .iter()
+            .any(|e: &EdgeRef| EdgeRef::ptr_eq(e, edge))
+    }
+
+    /// Checks whether the given vertex borders this cell.
+    /// Assumes this cell's edges can currently be read.
+    pub fn has_vertex(&self, vertex: VertexID) -> bool {
+        self.edges
+            .iter()
+            .any(|e: &EdgeRef| e.read().unwrap().connects_to(vertex))
+    }
+
+    /// Gets an immutable reference to the vector of edges that border this cell.
+    pub fn get_edges(&self) -> &Vec<EdgeRef> {
+        &self.edges
+    }
+}
 
 #[derive(Debug, Clone, Copy)]
-pub enum Cell {
+pub enum CellType {
     /// This is a blank cell.
     Blank,
     /// This is a cell with a colored square in it, which needs to be segregated from symbols of other colors.
@@ -33,7 +76,7 @@ impl TryFrom<u8> for TriangleCount {
             1 => Ok(TriangleCount::One),
             2 => Ok(TriangleCount::Two),
             3 => Ok(TriangleCount::Three),
-            _ => Err(())
+            _ => Err(()),
         }
     }
 }

@@ -1,3 +1,6 @@
+/// The identifier for a vertex.
+pub type VertexID = usize;
+
 #[derive(Debug, Clone, Copy)]
 pub enum Vertex {
     /// This vertex does not exist on the grid.

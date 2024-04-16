@@ -480,4 +480,9 @@ mod tests {
         let vector = vec2!(2., -10.).lerp(vec2!(10.), 0.5);
         assert_eq!(vector, vec2!(6., 0.));
     }
+
+    #[test]
+    fn test_vec2cast() {
+        assert_eq!(vec2!(20i16), vec2cast!(vec2!(20u8), i16))
+    }
 }
