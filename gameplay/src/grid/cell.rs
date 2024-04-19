@@ -11,15 +11,30 @@ pub struct Cell {
 }
 
 impl Cell {
-    pub fn new(edges: Vec<EdgeRef>) -> Self {
-        Cell {
-            edges,
-            kind: CellType::Blank,
-        }
+    /// Creates a new cell. Edges must be sorted in any winding order. (clockwise or anticlockwise)
+    pub fn new(edges: Vec<EdgeRef>) -> Result<Self, NewCellError> {
+        Self::new_of_kind(edges, CellType::Blank)
     }
 
-    pub fn new_of_kind(edges: Vec<EdgeRef>, kind: CellType) -> Self {
-        Cell { edges, kind }
+    /// Creates a new cell with a specific type. Edges must be sorted in any winding order. (clockwise or anticlockwise)
+    pub fn new_of_kind(edges: Vec<EdgeRef>, kind: CellType) -> Result<Self, NewCellError> {
+        if edges.len() < 3 {
+            return Err(NewCellError::NotEnoughEdges);
+        }
+        if edges
+            .iter()
+            .fold(Some(edges[0].clone()), |acc: Option<EdgeRef>, e| {
+                if acc?.read().unwrap().connects_to_edge(e) {
+                    Some(e.clone())
+                } else {
+                    None
+                }
+            })
+            .is_none()
+        {
+            return Err(NewCellError::NotInWindingOrder);
+        }
+        Ok(Cell { edges, kind })
     }
 
     /// Checks whether the given edge borders this cell.
@@ -37,9 +52,35 @@ impl Cell {
             .any(|e: &EdgeRef| e.read().unwrap().connects_to(vertex))
     }
 
+    pub fn get_edgerefs_iter(&self) -> impl Iterator<Item = EdgeRef> + '_ {
+        self.edges.iter().cloned()
+    }
+
     /// Gets an immutable reference to the vector of edges that border this cell.
     pub fn get_edges(&self) -> &Vec<EdgeRef> {
         &self.edges
+    }
+
+    pub fn get_vertices_in_winding_order(&self) -> Vec<VertexID> {
+        let mut vertices = self.edges.iter().fold(
+            vec![{
+                let first_edge = self.edges[0].read().unwrap();
+                first_edge
+                    .get_other_vertex(first_edge.which_vertex_connects(&self.edges[1]).unwrap())
+                    .unwrap()
+            }],
+            |mut acc: Vec<VertexID>, e| {
+                acc.push(
+                    e.read()
+                        .unwrap()
+                        .get_other_vertex(*acc.last().unwrap())
+                        .unwrap(),
+                );
+                acc
+            },
+        );
+        vertices.truncate(self.edges.len());
+        vertices
     }
 }
 
@@ -79,4 +120,10 @@ impl TryFrom<u8> for TriangleCount {
             _ => Err(()),
         }
     }
+}
+
+#[derive(Debug)]
+pub enum NewCellError {
+    NotEnoughEdges,
+    NotInWindingOrder,
 }

@@ -2,6 +2,6 @@
 members = [
     "gameplay",
     "frontend-3ds",
-    "witness-core",
+    "witness-core", "frontend-sdl2",
 ]
 resolver = "2"

@@ -34,6 +34,7 @@ impl Vector2Extensions for GridVector2 {
 }
 
 /// A Witness puzzle.
+#[derive(Debug)]
 pub struct Grid {
     size: GridVector2,
     vertices: Vec<Vertex>,
@@ -96,13 +97,13 @@ impl Grid {
                     right_edge.unwrap(),
                     bottom_edge.unwrap(),
                     left_edge.unwrap()
-                ]));
+                ]).unwrap());
             })
         });
         let cells = cells.into_iter().map(|x| Rc::new(RwLock::new(x))).collect();
         Grid {
             size,
-            vertices: vec![Vertex::None; (size + vec2!(1)).area()],
+            vertices: vec![Vertex::Vertex; (size + vec2!(1)).area()],
             edges,
             cells,
         }
@@ -128,7 +129,7 @@ impl Grid {
 
     /// Checks whether a vertex exists.
     pub fn vertex_exists(&self, id: VertexID) -> bool {
-        id < (self.size + vec2!(1)).sum()
+        id < (self.size + 1).area()
     }
 
     /// Returns a copy of the vertex at the given position, if it exists.
@@ -220,5 +221,49 @@ impl Grid {
             not_done.extend(filtered);
         }
         flood_filled
+    }
+
+    pub fn get_all_vertex_ids_iter(&self) -> impl Iterator<Item = VertexID> + '_ {
+        (0..(self.size + 1).area()).into_iter()
+    }
+
+    pub fn get_all_edgerefs_iter(&self) -> impl Iterator<Item = EdgeRef> + '_ {
+        self.edges.iter().cloned()
+    }
+
+    pub fn get_all_cellrefs_iter(&self) -> impl Iterator<Item = CellRef> + '_ {
+        self.cells.iter().cloned()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn make_new_grid() {
+        let size = vec2!(2, 4);
+        let grid = Grid::new(size);
+        assert_eq!(grid.vertices.len(), (size + 1).area());
+        println!("{:#?}", grid);
+    }
+
+    #[test]
+    fn iterate_all_vertices_on_new_grid() {
+        let grid = Grid::new(vec2!(2, 4));
+        let mut counter = 0;
+        assert!(grid.get_all_vertex_ids_iter().all(|x| {
+            counter += 1;
+            matches!(grid.vertices[x], Vertex::Vertex)
+        }));
+        assert_eq!(counter, grid.vertices.len());
+    }
+
+    #[test]
+    fn test_get_winding_order() {
+        let grid = Grid::new(vec2!(1, 1));
+        let cell = grid.cells[0].read().unwrap();
+        assert_eq!(cell.get_vertices_in_winding_order().len(), cell.get_edges().len());
+        // FIXME: Actually test if this gets the vertices in the right order
     }
 }

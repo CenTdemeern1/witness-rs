@@ -33,10 +33,43 @@ impl Edge {
         self.from == id || self.to == id
     }
 
+    /// Returns whether this edge is connected to the given edge by a shared vertex.
+    pub fn connects_to_edge(&self, edgeref: &EdgeRef) -> bool {
+        let edge = edgeref.read().unwrap();
+        edge.connects_to(self.from) || edge.connects_to(self.to)
+    }
+    
+    /// Returns which vertex connects this edge and some other edge, if any.
+    pub fn which_vertex_connects(&self, edgeref: &EdgeRef) -> Option<VertexID> {
+        let edge = edgeref.read().unwrap();
+        if edge.connects_to(self.from) {
+            Some(self.from)
+        } else if edge.connects_to(self.to) {
+            Some(self.to)
+        } else {
+            None
+        }
+    }
+
+    pub fn get_other_vertex(&self, id: VertexID) -> Option<VertexID> {
+        if self.from == id {
+            Some(self.to)
+        } else if self.to == id {
+            Some(self.from)
+        } else {
+            None
+        }
+    }
+
     /// Gets the vertex IDs of the vertices this edge is connected to.
     /// IDs are sorted from low to high numerically.
-    #[deprecated = "This will likely not be used and it assumes that IDs are numerical. Considered for removal."]
-    pub fn get_vertices(&self) -> [VertexID; 2] {
+    pub fn get_vertices_tuple(&self) -> (VertexID, VertexID) {
+        (self.from, self.to)
+    }
+
+    /// Gets the vertex IDs of the vertices this edge is connected to.
+    /// IDs are sorted from low to high numerically.
+    pub fn get_vertices_array(&self) -> [VertexID; 2] {
         [self.from, self.to]
     }
 }

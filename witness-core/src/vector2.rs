@@ -28,6 +28,26 @@ impl<T> Vector2<T> {
     pub fn transpose(self) -> Self {
         vec2!(self.y, self.x)
     }
+
+    pub fn into_tuple(self) -> (T, T) {
+        self.into()
+    }
+
+    pub fn into_array(self) -> [T; 2] {
+        self.into()
+    }
+}
+
+impl<T> Into<(T, T)> for Vector2<T> {
+    fn into(self) -> (T, T) {
+        (self.x, self.y)
+    }
+}
+
+impl<T> Into<[T; 2]> for Vector2<T> {
+    fn into(self) -> [T; 2] {
+        [self.x, self.y]
+    }
 }
 
 macro_rules! vec2 {
