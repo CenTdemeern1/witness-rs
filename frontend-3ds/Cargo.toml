@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 ctru-rs = { git = "https://github.com/rust3ds/ctru-rs" }
+citro3d = { git = "https://github.com/rust3ds/citro3d-rs" }
 gameplay = { path = "../gameplay" }
 
 [package.metadata.cargo-3ds]

@@ -1,3 +1,4 @@
+use citro3d::Instance;
 use ctru::prelude::*;
 
 fn main() {
@@ -5,6 +6,7 @@ fn main() {
     let mut hid = Hid::new().unwrap();
     let gfx = Gfx::new().unwrap();
     let _console = Console::new(gfx.top_screen.borrow_mut());
+    let gpu = Instance::new();
 
     println!("Hello, World!");
     println!("Call to gameplay crate: {}", gameplay::add(1, 2));
