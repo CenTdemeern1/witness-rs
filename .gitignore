@@ -1,2 +1,3 @@
 /target
 .DS_Store
+/frontend-3ds/romfs/shaders/*.bin
