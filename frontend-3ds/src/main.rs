@@ -3,14 +3,6 @@
 use citro3d::{attrib::{Format, Info, Register}, buffer::Primitive, math::{AspectRatio, ClipPlanes, Matrix4, Projection}, shader::{Library, Program}, Instance};
 use ctru::{linear::LinearAllocator, prelude::*, services::gfx::TopScreen3D};
 
-// fn load_example_shader_program() -> (Library, Program) {
-//     let vshader = std::fs::read("romfs:/shaders/projection_vcolor.v.pica.bin").unwrap();
-//     let library = Library::from_bytes(&vshader).unwrap();
-//     let entrypoint = library.get(0).unwrap();
-//     let program = Program::new(entrypoint).unwrap();
-//     (library, program)
-// }
-
 fn main() {
     let apt = Apt::new().unwrap();
     let mut hid = Hid::new().unwrap();
@@ -25,7 +17,6 @@ fn main() {
     let top_screen_render_target = gpu.render_target(400, 240, left_eye, None).unwrap();
 
     // Load shader program
-    // let (shader_library, shader_program) = load_example_shader_program();
     let vshader = std::fs::read("romfs:/shaders/projection_vcolor.v.pica.bin").unwrap();
     let shader_library = Library::from_bytes(&vshader).unwrap();
     let entrypoint = shader_library.get(0).unwrap();
@@ -86,5 +77,5 @@ fn main() {
         }
     }
 
-    drop(shader_library)
+    drop(shader_library);
 }
